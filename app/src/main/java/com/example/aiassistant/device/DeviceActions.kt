@@ -18,7 +18,7 @@ class DeviceActions(private val context: Context) {
             "set_alarm" -> {
                 val h = input.int("hour")
                 val m = input.int("minute")
-                if (h !in 0..23 || m !in 0..59) return "Invalid time: $h:$m"
+                if (h !in 0..23 || m !in 0..59) "Invalid time: $h:$m"
                 launch(
                     Intent(AlarmClock.ACTION_SET_ALARM)
                         .putExtra(AlarmClock.EXTRA_HOUR, h)
@@ -30,7 +30,7 @@ class DeviceActions(private val context: Context) {
             }
             "set_timer" -> {
                 val s = input.int("seconds")
-                if (s !in 1..86400) return "Invalid timer length: $s seconds (1 se 86400 allowed)"
+                if (s !in 1..86400) "Invalid timer length: $s seconds (1 se 86400 allowed)"
                 launch(
                     Intent(AlarmClock.ACTION_SET_TIMER)
                         .putExtra(AlarmClock.EXTRA_LENGTH, s)
@@ -42,13 +42,13 @@ class DeviceActions(private val context: Context) {
             "open_app" -> openApp(input.str("app_name").orEmpty())
             "web_search" -> {
                 val q = input.str("query").orEmpty()
-                if (q.isBlank()) return "Empty query"
+                if (q.isBlank()) "Empty query"
                 launch(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=" + Uri.encode(q))))
                 "Search opened for: $q"
             }
             "open_dialer" -> {
                 val n = input.str("number").orEmpty().filter { it.isDigit() || it == '+' || it == '*' || it == '#' }
-                if (n.isEmpty()) return "Invalid phone number"
+                if (n.isEmpty()) "Invalid phone number"
                 launch(Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(n))))
                 "Dialer opened with $n (user ko call khud dabana hoga)"
             }
