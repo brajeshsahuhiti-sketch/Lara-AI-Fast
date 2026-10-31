@@ -45,18 +45,27 @@ class GeminiClient {
         contents: JsonArray,
         tools: JsonArray? = null,
     ): JsonArray {
-        var attempt = 0
-        while (true) {
+        val candidateModels = listOf(
+            model,
+            model,
+            "gemini-2.5-flash-lite",
+            "gemini-2.0-flash"
+        )
+        var lastError: ApiException? = null
+        for ((index, targetModel) in candidateModels.withIndex()) {
             try {
-                return call(apiKey, model, system, contents, tools)
+                return call(apiKey, targetModel, system, contents, tools)
             } catch (e: ApiException) {
+                lastError = e
                 val retryable = e.code == 429 || e.code >= 500
-                if (retryable && attempt < 1) {
-                    attempt++
-                    delay(800L)
-                } else throw e
+                if (retryable && index < candidateModels.lastIndex) {
+                    delay(700L * (index + 1))
+                } else {
+                    throw e
+                }
             }
         }
+        throw lastError!!
     }
 
     private suspend fun call(
